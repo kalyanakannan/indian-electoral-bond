@@ -242,7 +242,10 @@ def display_individual_party_data(party_year_group, sorted_party, parties):
 def display_news():
     articles = {
         "DMK got ₹509 crore in electoral bonds from Future Gaming and Hotel Services - March 17, 2024 07:48 pm":"https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece",
-        "Electoral Bonds: 'Lottery King' Gave Rs 450 Cr to Parties Soon After ED Raids - 16 Mar 2024, 9:51 AM IST":"https://www.thequint.com/news/politics/electoral-bonds-data-future-gaming-lottery-santiago-martin-enforcement-directorate"
+        "Electoral Bonds: 'Lottery King' Gave Rs 450 Cr to Parties Soon After ED Raids - 16 Mar 2024, 9:51 AM IST":"https://www.thequint.com/news/politics/electoral-bonds-data-future-gaming-lottery-santiago-martin-enforcement-directorate",
+        "Electoral Bonds: Infra, power, pharma companies among top corporate donors - 16 March 2024, 05:48 IST":"https://www.deccanherald.com/business/electoral-bonds-infra-power-pharma-cos-among-top-corporate-donors-2939004",
+        "Top Electoral Bond Purchasers Include Companies Raided Or Under the Scanner - 15/MAR/2024": "https://thewire.in/business/top-electoral-bond-purchasers-include-some-companies-that-were-raided-or-under-the-scanner",
+        "Electoral bonds data | Many top donors were under ED and Income Tax Department scanner - March 15, 2024 02:03 pm": "https://www.thehindu.com/data/ed-and-it-had-conducted-searches-on-many-firms-which-purchased-electoral-bonds/article67954005.ece"
     }
     for title, url in articles.items():
         news_i.markdown(f'<a href="{url}" target="_blank">{title}</a>', unsafe_allow_html=True)
