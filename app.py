@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import urllib.parse
 import matplotlib.pyplot as plt
+from streamlit_elements import elements, mui, html
 
 def load_and_prepare_data(csv_file):
     companies = pd.read_csv(csv_file)
@@ -39,16 +40,16 @@ def load_and_prepare_party_data(csv_file):
     return parties
 
 def summarize_data(companies):
-    year_company_group = companies.groupby(['Year', 'Company']).agg({'Company':'first','Year':'first', 'Amount':['sum', 'count']})
-    year_company_group.columns = ['Company', 'Year', 'Amount', 'Bond_count']
-    company_group = companies.groupby("Company").agg({'Company':'first', 'Amount':['sum', 'count']})
-    company_group.columns = ['Company', 'Amount', 'Bond_count']
+    year_company_group = companies.groupby(['Year', 'Company']).agg({'Company':'first','Category':'first','Year':'first', 'Amount':['sum', 'count']})
+    year_company_group.columns = ['Company','Category', 'Year', 'Amount', 'Bond_count']
+    company_group = companies.groupby("Company").agg({'Company':'first','Category':'first', 'Amount':['sum', 'count']})
+    company_group.columns = ['Company','Category', 'Amount', 'Bond_count']
     company_group['Amount (₹ Cr)'] = (company_group['Amount'] / 10**7).map("{:,.2f}".format)
     company_group['percentage'] = (company_group['Amount'] / company_group['Amount'].sum() * 100).map('{:.2f}%'.format)
     parent_company_group = companies.groupby(['Parent Company']).agg({ 'Amount':['sum', 'count']})
     parent_company_group.columns = ['Amount', 'Bond_count']
-    category_group = companies.groupby(['Category']).agg({'Amount':['sum', 'count']})
-    category_group.columns = ['Amount', 'Bond_count']
+    category_group = companies.groupby(['Category']).agg({'Category':'first', 'Amount':['sum', 'count']})
+    category_group.columns = ['Category', 'Amount', 'Bond_count']
     category_group['Amount (₹ Cr)'] = (category_group['Amount'] / 10**7).map("{:,.2f}".format)
     parent_company_group['Amount (₹ Cr)'] = (parent_company_group['Amount'] / 10**7).map("{:,.2f}".format)
     parent_company_group['percentage'] = (parent_company_group['Amount'] / parent_company_group['Amount'].sum() * 100).map('{:.2f}%'.format)
@@ -110,12 +111,23 @@ def display_overall_company_data(sorted_company, parent_company_group, category_
     # company_ov.subheader("Distribution of Top Electoral Bond Contributions by Company")
     # company_ov.markdown("---")
     # company_ov.pyplot(fig)
+    col1, col2 = company_ov.columns([3, 3])
+    with col1:
+        col1.subheader("Top Donor Categories by Electoral Bond Contributions")
+        col1.markdown("---")
+        col1.dataframe(category_group, use_container_width=True)
     
-    company_ov.subheader("Top Donor Categories by Electoral Bond Contributions")
-    company_ov.markdown("---")
-    company_ov.dataframe(category_group, use_container_width=True, column_config={
-        "url": st.column_config.LinkColumn("Category"),
-    })
+    with col2:
+        col2.subheader("Explore Companies by Category")
+        col2.markdown("---")
+        selected_category = col2.selectbox(
+            "Select an Category",
+            category_group['Category']
+        )
+        category_companies = sorted_company[sorted_company['Category'] == selected_category].reset_index(drop=True)
+        category_companies['percentage'] = (category_companies['Amount'] / category_companies['Amount'].sum() * 100).map('{:.2f}%'.format)
+        col2.dataframe(category_companies)
+
 
 
     company_ov.subheader("Major Contributing Entities to Electoral Bonds")
