@@ -45,7 +45,6 @@ def summarize_data(companies):
     company_group.columns = ['Company', 'Amount', 'Bond_count']
     company_group['Amount (₹ Cr)'] = (company_group['Amount'] / 10**7).map("{:,.2f}".format)
     company_group['percentage'] = (company_group['Amount'] / company_group['Amount'].sum() * 100).map('{:.2f}%'.format)
-    print(companies.columns)
     parent_company_group = companies.groupby(['Parent Company']).agg({ 'Amount':['sum', 'count']})
     parent_company_group.columns = ['Amount', 'Bond_count']
     category_group = companies.groupby(['Category']).agg({'Amount':['sum', 'count']})
@@ -233,7 +232,7 @@ def display_individual_party_data(party_year_group, sorted_party, parties):
     party_i.dataframe(party_transaction_details[['Date','party','Amount']])
     # st.markdown(company_transaction_details[['Date','party','Amount']].to_html(escape=False, index=False), unsafe_allow_html=True)
 
-
+    st.divider()
 
 # Assuming other display functions follow a similar pattern to display_overall_company_data
 
@@ -252,7 +251,8 @@ def main():
     display_individual_party_data(party_year_group, sorted_party, parties)
 
 if __name__ == "__main__":
-    st.set_page_config(layout="wide")
+    st.set_page_config(layout="wide", page_title="Decoding Indian Electoral Bonds: An In-depth Analysis", page_icon="🧊",)
+    st.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">', unsafe_allow_html=True)
     st.title("Decoding Indian Electoral Bonds: An In-depth Analysis")
-    company_ov, company_i, party_ov, party_i = st.tabs(["Company - OverAll", "Company - Individual", "Party - OverAll", "Party - Individual"])
+    company_ov, company_i, party_ov, party_i = st.tabs(['Company - OverAll', "Company - Individual", "Party - OverAll", "Party - Individual"])
     main()
