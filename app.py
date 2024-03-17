@@ -126,7 +126,8 @@ def display_overall_company_data(sorted_company, parent_company_group, category_
         )
         category_companies = sorted_company[sorted_company['Category'] == selected_category].reset_index(drop=True)
         category_companies['percentage'] = (category_companies['Amount'] / category_companies['Amount'].sum() * 100).map('{:.2f}%'.format)
-        col2.dataframe(category_companies)
+        
+        col2.dataframe(category_companies[['Company', 'Bond_count', 'Amount (₹ Cr)', 'percentage']])
 
 
 
