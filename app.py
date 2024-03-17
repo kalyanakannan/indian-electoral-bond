@@ -51,6 +51,8 @@ def summarize_data(companies):
     category_group.columns = ['Amount', 'Bond_count']
     category_group['Amount (₹ Cr)'] = (category_group['Amount'] / 10**7).map("{:,.2f}".format)
     parent_company_group['Amount (₹ Cr)'] = (parent_company_group['Amount'] / 10**7).map("{:,.2f}".format)
+    parent_company_group['percentage'] = (parent_company_group['Amount'] / parent_company_group['Amount'].sum() * 100).map('{:.2f}%'.format)
+    category_group['percentage'] = (category_group['Amount'] / category_group['Amount'].sum() * 100).map('{:.2f}%'.format)
     return company_group.sort_values("Amount", ascending=False), year_company_group, parent_company_group.sort_values("Amount", ascending=False), category_group.sort_values("Amount", ascending=False)
 
 def summarize_party_data(parties):
@@ -237,7 +239,11 @@ def display_individual_party_data(party_year_group, sorted_party, parties):
 
     st.divider()
 
-# Assuming other display functions follow a similar pattern to display_overall_company_data
+def display_news():
+    articles = ["https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece"]
+    for article in articles:
+        iframe = f'<iframe src="{article}" width="700" height="400"></iframe>'
+        news_i.markdown(iframe, unsafe_allow_html=True)
 
 def main():
     companies = load_and_prepare_data('Electoral Bonds - Donors-list-category.csv')
@@ -257,5 +263,5 @@ if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Decoding Indian Electoral Bonds: An In-depth Analysis", page_icon="🧊",)
     st.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">', unsafe_allow_html=True)
     st.title("Decoding Indian Electoral Bonds: An In-depth Analysis")
-    company_ov, company_i, party_ov, party_i = st.tabs(['Company - OverAll', "Company - Individual", "Party - OverAll", "Party - Individual"])
+    company_ov, company_i, party_ov, party_i, news_i = st.tabs(['Company - OverAll', "Company - Individual", "Party - OverAll", "Party - Individual","News"])
     main()
