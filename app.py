@@ -62,6 +62,7 @@ def summarize_party_data(parties):
     party_group['percentage'] = (party_group['Amount'] / party_group['Amount'].sum() * 100).map('{:.2f}%'.format)
     return party_group.sort_values("Amount", ascending=False), party_year_group
 
+
 def create_google_search_url(company, date):
     date_obj = datetime.strptime(date, '%d/%b/%Y')
     three_months_before = date_obj - timedelta(days=60)
@@ -72,6 +73,12 @@ def create_google_search_url(company, date):
     encoded_query = urllib.parse.quote(query)
     url = f"https://www.google.com/search?q={encoded_query}&tbs=cdr:1,cd_min:{cd_min},cd_max:{cd_max}"
     return url
+
+def make_clickable(link, text):
+    # Streamlit uses Markdown to render text, so you can use an anchor tag for the link
+    return f"[{text}]({link})"
+
+    # Adding a column to the DataFrame with the clickable links
 
 def display_overall_company_data(sorted_company, parent_company_group, category_group):
     total_company, Total_amount, Total_Bond_count = company_ov.columns(3)
@@ -104,7 +111,9 @@ def display_overall_company_data(sorted_company, parent_company_group, category_
     
     company_ov.subheader("Top Donor Categories by Electoral Bond Contributions")
     company_ov.markdown("---")
-    company_ov.dataframe(category_group, use_container_width=True)
+    company_ov.dataframe(category_group, use_container_width=True, column_config={
+        "url": st.column_config.LinkColumn("Category"),
+    })
 
 
     company_ov.subheader("Major Contributing Entities to Electoral Bonds")
