@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 import urllib.parse
 import matplotlib.pyplot as plt
-from streamlit_elements import elements, mui, html
 
 def load_and_prepare_data(csv_file):
     companies = pd.read_csv(csv_file)
