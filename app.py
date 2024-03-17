@@ -240,10 +240,11 @@ def display_individual_party_data(party_year_group, sorted_party, parties):
     st.divider()
 
 def display_news():
-    articles = ["https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece"]
-    for article in articles:
-        iframe = f'<iframe src="{article}" width="700" height="400"></iframe>'
-        news_i.markdown(iframe, unsafe_allow_html=True)
+    articles = {
+        "DMK got ₹509 crore in electoral bonds from Future Gaming and Hotel Services":"https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece"
+    }
+    for title, url in articles.items():
+        news_i.markdown(f'<a href="{url}" target="_blank">{title}</a>', unsafe_allow_html=True)
 
 def main():
     companies = load_and_prepare_data('Electoral Bonds - Donors-list-category.csv')
@@ -258,6 +259,7 @@ def main():
     display_overall_party_data(sorted_party)
 
     display_individual_party_data(party_year_group, sorted_party, parties)
+    display_news()
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Decoding Indian Electoral Bonds: An In-depth Analysis", page_icon="🧊",)
