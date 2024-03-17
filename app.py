@@ -241,7 +241,8 @@ def display_individual_party_data(party_year_group, sorted_party, parties):
 
 def display_news():
     articles = {
-        "DMK got ₹509 crore in electoral bonds from Future Gaming and Hotel Services":"https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece"
+        "DMK got ₹509 crore in electoral bonds from Future Gaming and Hotel Services - March 15, 2024":"https://www.thehindu.com/news/national/tamil-nadu/dmk-got-509-crore-in-electoral-bonds-from-future-gaming-and-hotel-services/article67961369.ece",
+        "Electoral Bonds: 'Lottery King' Gave Rs 450 Cr to Parties Soon After ED Raids - 16 Mar 2024, 9:51 AM IST":"https://www.thequint.com/news/politics/electoral-bonds-data-future-gaming-lottery-santiago-martin-enforcement-directorate"
     }
     for title, url in articles.items():
         news_i.markdown(f'<a href="{url}" target="_blank">{title}</a>', unsafe_allow_html=True)
