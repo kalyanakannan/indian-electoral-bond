@@ -80,12 +80,10 @@ def display_overall_company_data(sorted_company, parent_company_group, category_
     Total_Bond_count.metric("Total Bonds", sorted_company['Bond_count'].sum())
 
     company_ov.markdown("---")
-
-    col1, col2 = company_ov.columns([3, 3])
-    with col1:
-        col1.subheader("Comprehensive Overview of Electoral Bond Contributions")
-        col1.markdown("---")
-        col1.dataframe(sorted_company.drop(['Company'], axis=1))
+    # with col1:
+    company_ov.subheader("Comprehensive Overview of Electoral Bond Contributions")
+    company_ov.markdown("---")
+    company_ov.dataframe(sorted_company.drop(['Company'], axis=1), use_container_width=True)
     top_10_df = sorted_company.head(10)
     top_5_df = sorted_company.head(5)
     others = pd.DataFrame(data={
@@ -99,34 +97,30 @@ def display_overall_company_data(sorted_company, parent_company_group, category_
     ax.pie(combined_df['Amount'], labels=combined_df['Company'], autopct='%1.1f%%', startangle=140)
     # centre_circle = plt.Circle((0,0),0.70,fc='white')
     # fig.gca().add_artist(centre_circle)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    with col2:
-        
-        col2.subheader("Distribution of Top Electoral Bond Contributions by Company")
-        col2.markdown("---")
-        col2.pyplot(fig)
-
-
-    with col1:
-        col1.subheader("Top Donor Categories by Electoral Bond Contributions")
-        col1.markdown("---")
-        col1.dataframe(category_group)
-
-    with col2:
-        col2.subheader("Major Contributing Entities to Electoral Bonds")
-        col2.markdown("---")
-        col2.dataframe(parent_company_group)
-
-    with col1:
-        col1.subheader("Leading Donor Companies by Electoral Bond Contributions")
-        col1.markdown("---")
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.  
+    # company_ov.subheader("Distribution of Top Electoral Bond Contributions by Company")
+    # company_ov.markdown("---")
+    # company_ov.pyplot(fig)
     
-        col1.bar_chart(top_10_df.set_index('Company')['Amount'])
+    company_ov.subheader("Top Donor Categories by Electoral Bond Contributions")
+    company_ov.markdown("---")
+    company_ov.dataframe(category_group, use_container_width=True)
 
-    with col2:
-        col2.subheader("Smallest Donor Companies by Electoral Bond Contributions")
-        col2.markdown("---")
-        col2.bar_chart(bottom_10_df.set_index('Company')['Amount'])
+
+    company_ov.subheader("Major Contributing Entities to Electoral Bonds")
+    company_ov.markdown("---")
+    company_ov.dataframe(parent_company_group, use_container_width=True)
+
+
+    company_ov.subheader("Leading Donor Companies by Electoral Bond Contributions")
+    company_ov.markdown("---")
+
+    company_ov.bar_chart(top_10_df.set_index('Company')['Amount'])
+
+
+    company_ov.subheader("Smallest Donor Companies by Electoral Bond Contributions")
+    company_ov.markdown("---")
+    company_ov.bar_chart(bottom_10_df.set_index('Company')['Amount'])
 
 
 def display_overall_party_data(sorted_party):
