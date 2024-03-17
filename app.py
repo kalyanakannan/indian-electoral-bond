@@ -252,6 +252,7 @@ def main():
     display_individual_party_data(party_year_group, sorted_party, parties)
 
 if __name__ == "__main__":
+    st.title("Decoding Indian Electoral Bonds: An In-depth Analysis")
     st.set_page_config(layout="wide")
     company_ov, company_i, party_ov, party_i = st.tabs(["Company - OverAll", "Company - Individual", "Party - OverAll", "Party - Individual"])
     main()
