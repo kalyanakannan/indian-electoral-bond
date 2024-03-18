@@ -23,7 +23,7 @@ def summarize_data(companies):
     )
     company_group = aggregate_data(
         ["Company"],
-        {"Company": "first", "Category": "first", "Amount": ["sum", "count"]},
+        {"Company": "first", "company_id":"first","Category": "first", "Amount": ["sum", "count"]},
         companies,
     )
     parent_company_group = aggregate_data(
