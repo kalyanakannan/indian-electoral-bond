@@ -6,6 +6,7 @@ from company_handler import (
     display_individual_company_data,
     display_overall_company_data,
 )
+from company_visualization_hadler import display_overall_company_visualization
 from data_preprocessing import summarize_data, summarize_party_data
 
 
@@ -26,7 +27,10 @@ def main():
 
     # Display overview and detailed data for companies using the processed data.
     display_overall_company_data(
-        sorted_company, parent_company_group, category_group, company_ov
+        sorted_company, parent_company_group, category_group, company_ov_data
+    )
+    display_overall_company_visualization(
+        sorted_company, parent_company_group, category_group, company_ov_vi
     )
     display_individual_company_data(
         year_company_group, sorted_company, companies, company_i
@@ -57,6 +61,8 @@ if __name__ == "__main__":
         unsafe_allow_html=True,
     )
 
+    
+
     # Set the page title for the analysis.
     st.title("Decoding Indian Electoral Bonds: An In-depth Analysis")
 
@@ -70,6 +76,8 @@ if __name__ == "__main__":
             "News",
         ]
     )
+
+    company_ov_data, company_ov_vi = company_ov.tabs(["Data", "Visualization"])
 
     # Execute the main function to run the app.
     main()
