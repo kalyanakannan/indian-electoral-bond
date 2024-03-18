@@ -29,6 +29,14 @@ def bond_purchase_heatmap(company_ov_vi, companies):
         for month in transaction_matrix.columns
     ]
 
+    # data_for_heatmap = [[d[1], d[0], d[2] if d[2] != 0 else "-"] for d in data_for_heatmap]
+
+    data_for_heatmap = [
+        [str(year), str(month), transaction_count]
+        for year, month, transaction_count in data_for_heatmap
+        if transaction_count != 0  # Exclude zero counts
+    ]
+
     max_count = max(count for _, _, count in data_for_heatmap if count is not None)
 
     option = {
@@ -37,7 +45,7 @@ def bond_purchase_heatmap(company_ov_vi, companies):
         "xAxis": {"type": "category", "data": months_ordered, "splitArea": {"show": True}},
         "yAxis": {"type": "category", "data": Years, "splitArea": {"show": True}},
         "visualMap": {
-            "min": 0,
+            "min": 1,
             "max": max_count,
             "calculable": True,
             "orient": "horizontal",
