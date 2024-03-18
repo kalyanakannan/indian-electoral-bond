@@ -58,16 +58,16 @@ def top_category(company_ov_vi, category_group, n, left_Col):
 
 def top_contributors(company_ov_vi, sorted_company, n, right_col):
     top_5_df = sorted_company.head(n)
-    others = pd.DataFrame(
-        data={"Company": ["Other"], "Amount": [sorted_company["Amount"][n:].sum()]}
-    )
-    others["Amount (₹ Cr)"] = (others["Amount"] / 10**7).map("{:,.2f}".format)
-    combined_df = pd.concat([top_5_df, others])
-    combined_df["Amount (₹ Cr)"] = (
-        combined_df["Amount (₹ Cr)"].str.replace(",", "").astype(float)
+    # others = pd.DataFrame(
+    #     data={"Company": ["Other"], "Amount": [sorted_company["Amount"][n:].sum()]}
+    # )
+    # others["Amount (₹ Cr)"] = (others["Amount"] / 10**7).map("{:,.2f}".format)
+    # combined_df = pd.concat([top_5_df, others])
+    top_5_df["Amount (₹ Cr)"] = (
+        top_5_df["Amount (₹ Cr)"].str.replace(",", "").astype(float)
     )
     data = (
-        combined_df[["Company", "Amount (₹ Cr)"]]
+        top_5_df[["Company", "Amount (₹ Cr)"]]
         .rename(columns={"Company": "name", "Amount (₹ Cr)": "value"})
         .to_dict("records")
     )
@@ -75,7 +75,7 @@ def top_contributors(company_ov_vi, sorted_company, n, right_col):
     options = {
        
         "tooltip": {"trigger": "item"},
-        "legend": {"orient": "vertical", "left": "left"},
+        "legend": {"orient": "horizontal ", "bottom": "bottom"},
         "dataset": [
             {
                 "source": data,
