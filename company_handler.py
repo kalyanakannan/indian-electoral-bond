@@ -1,6 +1,7 @@
 import urllib.parse
 import matplotlib.pyplot as plt
 import pandas as pd
+import streamlit as st
 
 def display_metrics(company_ov, sorted_company):
     """
@@ -15,6 +16,11 @@ def display_metrics(company_ov, sorted_company):
     total_amount.metric("Total Amount (₹ Cr)", sorted_company["Amount"].sum() / 10**7)
     total_bond_count.metric("Total Bonds", sorted_company["Bond_count"].sum())
 
+def add_open_corporate_url(url):
+    url_prefix  = "https://opencorporates.com/companies/in/"
+    if url:
+        url = url_prefix + url
+    return url
 
 def display_overview(company_ov, sorted_company):
     """
@@ -25,9 +31,15 @@ def display_overview(company_ov, sorted_company):
     - sorted_company: DataFrame containing sorted company data.
     """
     company_ov.subheader("Comprehensive Overview of Electoral Bond Contributions")
+    
+    sorted_company['company_details'] = sorted_company['company_id'].apply(add_open_corporate_url)
+    # sorted_company = sorted_company.drop([" "], axis=1)
+    sorted_company = sorted_company.reset_index(drop=True)
     company_ov.markdown("---")
     company_ov.dataframe(
-        sorted_company.drop(["Company"], axis=1), use_container_width=True
+        sorted_company[['Company', 'Category', 'Bond_count', 'Amount', 'Amount (₹ Cr)', 'percentage', 'company_details']] , use_container_width=True, column_config={
+        "company_details": st.column_config.LinkColumn("company_details"),
+    }
     )
 
 
