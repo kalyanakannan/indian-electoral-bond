@@ -45,6 +45,7 @@ def load_and_prepare_data(csv_file):
     # Parse dates and extract year
     companies["Date_format"] = pd.to_datetime(companies["Date"], format="%d/%b/%Y")
     companies["Year"] = companies["Date_format"].dt.year
+    companies["Month"] = companies["Date_format"].dt.strftime("%b")
 
     # Standardize case for 'Category' and 'Parent Company'
     companies["Category"] = companies["Category"].str.title()

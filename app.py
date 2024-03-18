@@ -30,7 +30,7 @@ def main():
         sorted_company, parent_company_group, category_group, company_ov_data
     )
     display_overall_company_visualization(
-        sorted_company, parent_company_group, category_group, company_ov_vi
+        sorted_company, parent_company_group, category_group, companies, company_ov_vi
     )
     display_individual_company_data(
         year_company_group, sorted_company, companies, company_i
