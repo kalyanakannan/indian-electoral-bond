@@ -96,10 +96,14 @@ def display_category_data(company_ov, category_group, sorted_company):
         category_companies["percentage"] = (
             category_companies["Amount"] / category_companies["Amount"].sum() * 100
         ).map("{:.2f}%".format)
-
-        col2.dataframe(
-            category_companies[["Company", "Bond_count", "Amount (₹ Cr)", "percentage"]]
-        )
+        if selected_category == 'Individuals':
+            col2.dataframe(
+                category_companies[["Company", "Parent Company", "Bond_count", "Amount (₹ Cr)", "percentage"]]
+            )
+        else:
+            col2.dataframe(
+                category_companies[["Company", "Bond_count", "Amount (₹ Cr)", "percentage"]]
+            )
 
 
 def display_major_contributors(company_ov, parent_company_group):
