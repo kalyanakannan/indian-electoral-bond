@@ -14,12 +14,9 @@ def load_and_prepare_data(csv_file):
     Returns:
     - DataFrame with preprocessed company data.
     """
-    # Load data from CSV
-    # conn = st.connection("gsheets", type=GSheetsConnection)
-    # df = conn.read(
-    #     worksheet="Donors-list",
-    #     ttl="10m",
-    # )
+    # sheet_id = st.secrets["google_sheets"]["sheet_id"]
+    # sheet_name = "Donors-list"
+    # url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
     companies = pd.read_csv(csv_file)
 
     # Rename columns for clarity and consistency
@@ -53,9 +50,18 @@ def load_and_prepare_data(csv_file):
 
     return companies
 
+def news_articles_loader():
+    sheet_id = st.secrets["google_sheets"]["news_sheet_id"]
+    sheet_name = "articles"
+    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
+    articles = pd.read_csv(url)
+    return articles
+
 
 def load_and_prepare_party_data(csv_file):
-    # Load the dataset from a CSV file into a pandas DataFrame.
+    # sheet_id = st.secrets["google_sheets"]["sheet_id"]
+    # sheet_name = "Party-list"
+    # url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
     parties = pd.read_csv(csv_file)
 
     # Initial regex replacements are commented out, but this code can be

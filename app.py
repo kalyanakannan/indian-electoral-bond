@@ -12,10 +12,10 @@ from data_preprocessing import summarize_data, summarize_party_data
 
 def main():
     # Load and prepare company data from CSV.
-    companies = load_and_prepare_data("Electoral Bonds - Donors-list-category.csv")
+    companies = load_and_prepare_data('data/Electoral Bonds - Donors-list-category.csv')
 
     # Load and prepare party data from CSV.
-    parties = load_and_prepare_party_data("Electoral Bonds - Party-list.csv")
+    parties = load_and_prepare_party_data('data/Electoral Bonds - Party-list.csv')
 
     # Summarize company data to get sorted lists and grouped data for display.
     sorted_company, year_company_group, parent_company_group, category_group = (
