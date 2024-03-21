@@ -71,6 +71,22 @@ def create_google_search_url(company, date):
     url = f"https://www.google.com/search?q={encoded_query}&tbs=cdr:1,cd_min:{cd_min},cd_max:{cd_max}"
     return url
 
+def aggregate_transactions(merged_df, group_by_column):
+    """Aggregate transactions by a specified column."""
+    transactions = merged_df.groupby(group_by_column).agg({
+        group_by_column: "first",
+        "Amount_y": ["sum", "count"]
+    })
+    transactions.columns = [group_by_column, 'Amount', 'bond_count']
+    return transactions.reset_index(drop=True)
+
+def format_and_sort_group(group, amount_format_function, percentage_calc_function):
+    """Format amounts and calculate percentages, then sort."""
+    group["Amount (₹ Cr)"] = group["Amount"].apply(amount_format_function)
+    total_amount = group["Amount"].sum()
+    group["percentage"] = group["Amount"].apply(lambda x: percentage_calc_function(x, total_amount))
+    return group.sort_values("Amount", ascending=False)
+
 
 def make_clickable(link, text):
     # Streamlit uses Markdown to render text, so you can use an anchor tag for the link

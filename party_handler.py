@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from utils import calculate_percentage, format_amount
+from utils import calculate_percentage, format_amount, aggregate_transactions, format_and_sort_group
 from streamlit_echarts import st_echarts
 
 def display_party_transactions(party_i, merged_df, selected_party):
@@ -81,27 +81,93 @@ def select_party(party_i, sorted_party):
     """
     return party_i.selectbox("Select a Party", sorted_party["party"].sort_values())
 
-def display_donated_companies(party_i, selected_party, merged_df, party_left):
+def display_donated_category(selected_party, merged_df, party_left):
+    transactions_grouped_by_category = aggregate_transactions(merged_df[merged_df["party"] == selected_party], 'Category')
+    formatted_group = format_and_sort_group(transactions_grouped_by_category, format_amount, calculate_percentage)
+    
+    party_left.subheader("Bonds Details by Category")
+    party_left.markdown("---")
+    party_left.dataframe(formatted_group[['Category', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+
+
+def display_donated_companies(selected_party, merged_df, party_left):
+
+    transactions_grouped_by_category = aggregate_transactions(merged_df[merged_df["party"] == selected_party], 'Company')
+    formatted_group = format_and_sort_group(transactions_grouped_by_category, format_amount, calculate_percentage)
+    
+    party_left.subheader("Companies Purchased for this party")
+    party_left.markdown("---")
+    party_left.dataframe(formatted_group[['Company', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+
+
+
+def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
+    
     party_transactions = merged_df[
         merged_df["party"] == selected_party
     ].reset_index(drop=True)
-    group_by_companies = party_transactions.groupby('Company').agg({"Company": "first","Amount_y": ["sum", "count"]})
-    group_by_companies.columns = ['Company', 'Amount', 'bond_count']
-    group_by_companies["Amount (₹ Cr)"] = group_by_companies["Amount"].apply(format_amount)
-    group_by_companies["percentage"] = group_by_companies["Amount"].apply(
-        lambda x: calculate_percentage(x, group_by_companies["Amount"].sum())
+    group_by_categories = party_transactions.groupby('Category').agg({"Category": "first","Amount_y": ["sum", "count"]})
+    group_by_categories.columns = ['Category', 'Amount', 'bond_count']
+    group_by_categories["Amount (₹ Cr)"] = group_by_categories["Amount"].apply(format_amount)
+    group_by_categories["percentage"] = group_by_categories["Amount"].apply(
+        lambda x: calculate_percentage(x, group_by_categories["Amount"].sum())
     )
+    group_by_categories = group_by_categories.sort_values("Amount", ascending=False)
 
-    party_left.subheader("Companies Purchased for this party")
-    party_left.markdown("---")
-    print(party_transactions.columns)
-    group_by_companies = group_by_companies.reset_index(drop=True)
-    group_by_companies = group_by_companies.sort_values("Amount", ascending=False)
-    
-    party_left.dataframe(group_by_companies[['Company', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+    group_by_categories["Amount (₹ Cr)"] = (
+        group_by_categories["Amount (₹ Cr)"].str.replace(",", "").astype(float)
+    )
+    data = (
+        group_by_categories[["Category", "Amount (₹ Cr)"]]
+        .rename(columns={"Category": "name", "Amount (₹ Cr)": "value"})
+        .to_dict("records")
+    )
+    options = {
+       
+        "tooltip": {"trigger": "item"},
+        "legend": {"orient": "horizontal ", "bottom": "bottom"},
+        "dataset": [
+            {
+                "source": data,
+            }
+        ],
+        "series": [
+            {
+                "type": "pie",
+                "radius": "50%",
+            },
+            {
+                "type": "pie",
+                "radius": "50%",
+                "label": {
+                    "position": "inside",
+                    "formatter": "{d}%",
+                    "color": "black",
+                    "fontSize": 18,
+                },
+                "emphasis": {
+                    "label": {"show": "true"},
+                    "itemStyle": {
+                        "shadowBlur": 10,
+                        "shadowOffsetX": 0,
+                        "shadowColor": "rgba(0, 0, 0, 0.5)",
+                    },
+                },
+            },
+        ],
+    }
+    party_right.header(f"Electoral Contributors' by Category")
+    with party_right:
+        st_echarts(
+            options=options,
+            height="600px",
+        )
+
+
 
 
 def top_contributors(party_i, merged_df, selected_party, party_right):
+    party_right.header(f"Electoral Contributors' for this party")
     party_n = party_right.selectbox(
             "Select Number of companies", [5,10,15,20],
         )
@@ -164,7 +230,7 @@ def top_contributors(party_i, merged_df, selected_party, party_right):
             },
         ],
     }
-    party_right.header(f"Electoral Contributors' for this party")
+    
     with party_right:
         st_echarts(
             options=options,
@@ -234,7 +300,9 @@ def display_individual_party_data(party_year_group, sorted_party, parties, merge
     selected_party = select_party(party_i, sorted_party)
     display_overall_transactions(party_i, sorted_party, selected_party)
     party_right, party_left = party_i.columns([3,3])
-    display_donated_companies(party_i, selected_party, merged_df, party_right)
+    display_donated_companies(selected_party, merged_df, party_right)
     top_contributors(party_i, merged_df, selected_party, party_left)
+    display_donated_category(selected_party, merged_df, party_right)
+    top_contributors_catgory(party_i, merged_df, selected_party, party_left)
     display_annual_party_contributions(party_i, party_year_group, selected_party)
     display_party_transactions(party_i, merged_df, selected_party)
