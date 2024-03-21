@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import urllib.parse
+import pandas as pd
 
 def format_amount(amount):
     """
@@ -12,6 +13,10 @@ def format_amount(amount):
     - A formatted string representing the amount in Crores with two decimal places.
     """
     return "{:,.2f}".format(amount / 10**7)
+
+def merge_parties_companies(parties, companies):
+    merged_df = pd.merge(companies, parties, on=['Bond Number', 'Prefix'])
+    return merged_df
 
 
 def calculate_percentage(part, whole):

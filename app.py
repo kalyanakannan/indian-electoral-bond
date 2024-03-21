@@ -33,7 +33,7 @@ def main():
         sorted_company, parent_company_group, category_group, companies, company_ov_vi
     )
     display_individual_company_data(
-        year_company_group, sorted_company, companies, company_i
+        year_company_group, sorted_company, companies, parties, company_i
     )
 
     # Display overview and detailed data for parties using the processed data.

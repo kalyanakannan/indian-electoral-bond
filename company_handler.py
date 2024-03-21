@@ -2,6 +2,7 @@ import urllib.parse
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
+from utils import calculate_percentage, format_amount, merge_parties_companies
 
 def display_metrics(company_ov, sorted_company):
     """
@@ -205,6 +206,31 @@ def display_aggregate_transactions(company_i, sorted_company, selected_company):
     company_i.markdown("---")
     company_i.dataframe(overall_transaction_details)
 
+def display_parties_redeemed_bonds(company_i, companies, selected_company, parties):
+    merged_df = merge_parties_companies (parties, companies)
+    companies_transactions = merged_df[
+        merged_df["Company"] == selected_company
+    ].reset_index(drop=True)
+    group_by_parties = companies_transactions.groupby('party').agg({"party": "first","Amount_y": ["sum", "count"]})
+    group_by_parties.columns = ['party', 'Amount', 'bond_count']
+    group_by_parties["Amount (₹ Cr)"] = group_by_parties["Amount"].apply(format_amount)
+    group_by_parties["percentage"] = group_by_parties["Amount"].apply(
+        lambda x: calculate_percentage(x, group_by_parties["Amount"].sum())
+    )
+
+    company_i.subheader("Parties That Have Redeemed Bonds")
+    company_i.markdown("---")
+    print(companies_transactions.columns)
+    company_i.dataframe(group_by_parties[['party', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+
+    # company_i.subheader("Parties That Have Redeemed Bonds")
+    # company_i.markdown("---")
+    # print(companies_transactions.columns)
+    # company_i.dataframe(companies_transactions[["Date_y", "party", "Amount_y", "Prefix","Bond Number"]], column_config={
+    #     "Date_y": "Date",
+    #     "Amount_y": "Amount"
+    # })
+
 def display_annual_contributions(company_i, year_company_group, selected_company):
     """
     Displays annual contributions of the selected company.
@@ -234,7 +260,7 @@ def display_annual_contributions(company_i, year_company_group, selected_company
         col2.markdown("---")
         col2.line_chart(selected_company_year_spendings.set_index("Year")["Amount"])
 
-def display_individual_company_data(year_company_group, sorted_company, companies, company_i):
+def display_individual_company_data(year_company_group, sorted_company, companies, parties, company_i):
     """
     Modular function to display data for an individual company, including transaction details,
     aggregate transactions, and annual contributions.
@@ -247,5 +273,6 @@ def display_individual_company_data(year_company_group, sorted_company, companie
     """
     selected_company = select_company(company_i, sorted_company)
     display_aggregate_transactions(company_i, sorted_company, selected_company)
+    display_parties_redeemed_bonds(company_i, companies, selected_company, parties)
     display_annual_contributions(company_i, year_company_group, selected_company)
     display_company_transactions(company_i, companies, selected_company)
