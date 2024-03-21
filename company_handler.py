@@ -2,6 +2,7 @@ import urllib.parse
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
+from streamlit_echarts import st_echarts
 from utils import calculate_percentage, format_amount
 
 def display_metrics(company_ov, sorted_company):
@@ -206,7 +207,7 @@ def display_aggregate_transactions(company_i, sorted_company, selected_company):
     company_i.markdown("---")
     company_i.dataframe(overall_transaction_details)
 
-def display_parties_redeemed_bonds(company_i,selected_company, merged_df):
+def display_parties_redeemed_bonds(company_i,selected_company, merged_df, company_left):
     companies_transactions = merged_df[
         merged_df["Company"] == selected_company
     ].reset_index(drop=True)
@@ -217,12 +218,12 @@ def display_parties_redeemed_bonds(company_i,selected_company, merged_df):
         lambda x: calculate_percentage(x, group_by_parties["Amount"].sum())
     )
 
-    company_i.subheader("Parties That Have Redeemed Bonds")
-    company_i.markdown("---")
+    company_left.subheader("Parties That Have Redeemed Bonds")
+    company_left.markdown("---")
     print(companies_transactions.columns)
     group_by_parties = group_by_parties.reset_index(drop=True)
     group_by_parties = group_by_parties.sort_values("Amount", ascending=False)
-    company_i.dataframe(group_by_parties[['party', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+    company_left.dataframe(group_by_parties[['party', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
 
     # company_i.subheader("Parties That Have Redeemed Bonds")
     # company_i.markdown("---")
@@ -231,6 +232,78 @@ def display_parties_redeemed_bonds(company_i,selected_company, merged_df):
     #     "Date_y": "Date",
     #     "Amount_y": "Amount"
     # })
+
+def top_contributors(company_i, merged_df, selected_company, company_right):
+    party_n = company_right.selectbox(
+            "Select Number of parties", [5,10,15,20],
+        )
+    companies_transactions = merged_df[
+        merged_df["Company"] == selected_company
+    ].reset_index(drop=True)
+    group_by_parties = companies_transactions.groupby('party').agg({"party": "first","Amount_y": ["sum", "count"]})
+    group_by_parties.columns = ['party', 'Amount', 'bond_count']
+    group_by_parties["Amount (₹ Cr)"] = group_by_parties["Amount"].apply(format_amount)
+    group_by_parties["percentage"] = group_by_parties["Amount"].apply(
+        lambda x: calculate_percentage(x, group_by_parties["Amount"].sum())
+    )
+    group_by_parties = group_by_parties.sort_values("Amount", ascending=False)
+
+    top_df = group_by_parties.head(party_n)
+    others = pd.DataFrame(
+        data={"party": ["Other"], "Amount": [group_by_parties["Amount"][party_n:].sum()]}
+    )
+    others["Amount (₹ Cr)"] = (others["Amount"] / 10**7).map("{:,.2f}".format)
+    combined_df = pd.concat([top_df, others])
+    combined_df["Amount (₹ Cr)"] = (
+        combined_df["Amount (₹ Cr)"].str.replace(",", "").astype(float)
+    )
+    data = (
+        combined_df[["party", "Amount (₹ Cr)"]]
+        .rename(columns={"party": "name", "Amount (₹ Cr)": "value"})
+        .to_dict("records")
+    )
+    options = {
+       
+        "tooltip": {"trigger": "item"},
+        "legend": {"orient": "horizontal ", "bottom": "bottom"},
+        "dataset": [
+            {
+                "source": data,
+            }
+        ],
+        "series": [
+            {
+                "type": "pie",
+                "radius": "50%",
+            },
+            {
+                "type": "pie",
+                "radius": "50%",
+                "label": {
+                    "position": "inside",
+                    "formatter": "{d}%",
+                    "color": "black",
+                    "fontSize": 18,
+                },
+                "emphasis": {
+                    "label": {"show": "true"},
+                    "itemStyle": {
+                        "shadowBlur": 10,
+                        "shadowOffsetX": 0,
+                        "shadowColor": "rgba(0, 0, 0, 0.5)",
+                    },
+                },
+            },
+        ],
+    }
+    company_right.header(f"Electoral Contributors' for this party")
+    with company_right:
+        st_echarts(
+            options=options,
+            height="600px",
+        )
+
+
 
 def display_annual_contributions(company_i, year_company_group, selected_company):
     """
@@ -274,6 +347,8 @@ def display_individual_company_data(year_company_group, sorted_company, companie
     """
     selected_company = select_company(company_i, sorted_company)
     display_aggregate_transactions(company_i, sorted_company, selected_company)
-    display_parties_redeemed_bonds(company_i, selected_company, merged_df)
+    company_right, company_left = company_i.columns([3,3])
+    display_parties_redeemed_bonds(company_i, selected_company, merged_df, company_right)
+    top_contributors(company_i, merged_df, selected_company, company_left)
     display_annual_contributions(company_i, year_company_group, selected_company)
     display_company_transactions(company_i, companies, selected_company)
