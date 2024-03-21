@@ -220,6 +220,7 @@ def display_parties_redeemed_bonds(company_i,selected_company, merged_df):
     company_i.subheader("Parties That Have Redeemed Bonds")
     company_i.markdown("---")
     print(companies_transactions.columns)
+    group_by_parties = group_by_parties.reset_index(drop=True)
     group_by_parties = group_by_parties.sort_values("Amount", ascending=False)
     company_i.dataframe(group_by_parties[['party', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
 
