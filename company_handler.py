@@ -170,7 +170,7 @@ def select_company(company_i, sorted_company):
     """
     return company_i.selectbox("Select a Company", sorted_company["Company"])
 
-def display_company_transactions(company_i, companies, selected_company):
+def display_company_transactions(company_i, merged_df, selected_company):
     """
     Displays transactions of the selected company with a link to related news.
     
@@ -179,8 +179,8 @@ def display_company_transactions(company_i, companies, selected_company):
     - companies: DataFrame containing company transaction data.
     - selected_company: The name of the selected company.
     """
-    company_transaction_details = companies[
-        companies["Company"] == selected_company
+    company_transaction_details = merged_df[
+        merged_df["Company"] == selected_company
     ].reset_index(drop=True)
     company_i.subheader("Detailed Donor Contributions by Date")
     company_i.markdown("---")
@@ -189,7 +189,11 @@ def display_company_transactions(company_i, companies, selected_company):
     url = f"https://news.google.com/search?q={encoded_query}"
     link_text = "News"
     company_i.markdown(f'<a href="{url}" target="_blank">{link_text}</a>', unsafe_allow_html=True)
-    company_i.dataframe(company_transaction_details[["Date", "Company", "Amount"]])
+    company_i.dataframe(company_transaction_details[["Date_x", "party", "Amount_x", "Prefix","Bond Number"]], column_config={
+        "Date_x": "Date",
+        "Amount_x": "Amount",
+        "party": "party Redeemed"
+    }, use_container_width=True)
 
 def display_aggregate_transactions(company_i, sorted_company, selected_company):
     """
@@ -351,4 +355,4 @@ def display_individual_company_data(year_company_group, sorted_company, companie
     display_parties_redeemed_bonds(company_i, selected_company, merged_df, company_right)
     top_contributors(company_i, merged_df, selected_company, company_left)
     display_annual_contributions(company_i, year_company_group, selected_company)
-    display_company_transactions(company_i, companies, selected_company)
+    display_company_transactions(company_i, merged_df, selected_company)
