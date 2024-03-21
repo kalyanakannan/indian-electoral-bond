@@ -28,6 +28,8 @@ def load_and_prepare_data(csv_file):
         r"AASHMAN ENERGY.*": "AASHMAN ENERGY PRIVATE LIMITED",
         r"APCO INFRATECH.*": "APCO INFRATECH PRIVATE LIMITED",
         r"MEGHA ENGINEERING.*": "MEGHA ENGINEERING AND INFRASTRUCTURES LIMITED",
+        r"DR REDDYS LABORATORIES LIMITED": "DR.REDDY'S LABORATORIES LTD",
+        r"NATCO PHARMA LTD": "NATCO PHARMA LIMITED"
     }
     for pattern, replacement in company_replacements.items():
         companies["Company"] = companies["Company"].str.replace(
