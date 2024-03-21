@@ -15,7 +15,7 @@ def display_party_transactions(party_i, merged_df, selected_party):
     party_transaction_details = merged_df[merged_df["party"] == selected_party].reset_index(drop=True)
     party_i.subheader("Date-specific Bond Redemption Details")
     party_i.markdown("---")
-    party_i.dataframe(party_transaction_details[["Date_y", "Company", "Amount_y", "Prefix","Bond Number"]], column_config={
+    party_i.dataframe(party_transaction_details[["Date_y", "Reference No  (URN)", "Journal Date", "Company", "Amount_y", "Prefix","Bond Number"]], column_config={
         "Date_y": "Date",
         "Amount_y": "Amount"
     }, use_container_width=True)

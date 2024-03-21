@@ -189,7 +189,7 @@ def display_company_transactions(company_i, merged_df, selected_company):
     url = f"https://news.google.com/search?q={encoded_query}"
     link_text = "News"
     company_i.markdown(f'<a href="{url}" target="_blank">{link_text}</a>', unsafe_allow_html=True)
-    company_i.dataframe(company_transaction_details[["Date_x", "party", "Amount_x", "Prefix","Bond Number"]], column_config={
+    company_i.dataframe(company_transaction_details[["Date_x", "Reference No  (URN)", "Journal Date", "party", "Amount_x", "Prefix","Bond Number"]], column_config={
         "Date_x": "Date",
         "Amount_x": "Amount",
         "party": "party Redeemed"
