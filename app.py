@@ -8,6 +8,7 @@ from company_handler import (
 )
 from company_visualization_hadler import display_overall_company_visualization
 from data_preprocessing import summarize_data, summarize_party_data
+from utils import merge_parties_companies
 
 
 def main():
@@ -16,6 +17,8 @@ def main():
 
     # Load and prepare party data from CSV.
     parties = load_and_prepare_party_data('data/Electoral Bonds - Party-list.csv')
+
+    merged_df = merge_parties_companies (parties, companies)
 
     # Summarize company data to get sorted lists and grouped data for display.
     sorted_company, year_company_group, parent_company_group, category_group = (
@@ -33,12 +36,12 @@ def main():
         sorted_company, parent_company_group, category_group, companies, company_ov_vi
     )
     display_individual_company_data(
-        year_company_group, sorted_company, companies, parties, company_i
+        year_company_group, sorted_company, companies, merged_df, company_i
     )
 
     # Display overview and detailed data for parties using the processed data.
     display_overall_party_data(sorted_party, party_ov)
-    display_individual_party_data(party_year_group, sorted_party, parties, party_i)
+    display_individual_party_data(party_year_group, sorted_party, parties, merged_df, party_i)
 
     # Display the latest news or relevant information.
     display_news(news_i)

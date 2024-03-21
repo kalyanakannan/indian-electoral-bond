@@ -2,7 +2,7 @@ import urllib.parse
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
-from utils import calculate_percentage, format_amount, merge_parties_companies
+from utils import calculate_percentage, format_amount
 
 def display_metrics(company_ov, sorted_company):
     """
@@ -206,8 +206,7 @@ def display_aggregate_transactions(company_i, sorted_company, selected_company):
     company_i.markdown("---")
     company_i.dataframe(overall_transaction_details)
 
-def display_parties_redeemed_bonds(company_i, companies, selected_company, parties):
-    merged_df = merge_parties_companies (parties, companies)
+def display_parties_redeemed_bonds(company_i,selected_company, merged_df):
     companies_transactions = merged_df[
         merged_df["Company"] == selected_company
     ].reset_index(drop=True)
@@ -221,6 +220,7 @@ def display_parties_redeemed_bonds(company_i, companies, selected_company, parti
     company_i.subheader("Parties That Have Redeemed Bonds")
     company_i.markdown("---")
     print(companies_transactions.columns)
+    group_by_parties = group_by_parties.sort_values("Amount", ascending=False)
     company_i.dataframe(group_by_parties[['party', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
 
     # company_i.subheader("Parties That Have Redeemed Bonds")
@@ -260,7 +260,7 @@ def display_annual_contributions(company_i, year_company_group, selected_company
         col2.markdown("---")
         col2.line_chart(selected_company_year_spendings.set_index("Year")["Amount"])
 
-def display_individual_company_data(year_company_group, sorted_company, companies, parties, company_i):
+def display_individual_company_data(year_company_group, sorted_company, companies, merged_df, company_i):
     """
     Modular function to display data for an individual company, including transaction details,
     aggregate transactions, and annual contributions.
@@ -273,6 +273,6 @@ def display_individual_company_data(year_company_group, sorted_company, companie
     """
     selected_company = select_company(company_i, sorted_company)
     display_aggregate_transactions(company_i, sorted_company, selected_company)
-    display_parties_redeemed_bonds(company_i, companies, selected_company, parties)
+    display_parties_redeemed_bonds(company_i, selected_company, merged_df)
     display_annual_contributions(company_i, year_company_group, selected_company)
     display_company_transactions(company_i, companies, selected_company)

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from utils import calculate_percentage, format_amount
 
 def display_party_transactions(party_i, parties, selected_party):
     """
@@ -76,6 +77,23 @@ def select_party(party_i, sorted_party):
     """
     return party_i.selectbox("Select a Party", sorted_party["party"].sort_values())
 
+def display_donated_companies(party_i, selected_party, merged_df):
+    party_transactions = merged_df[
+        merged_df["party"] == selected_party
+    ].reset_index(drop=True)
+    group_by_companies = party_transactions.groupby('Company').agg({"Company": "first","Amount_y": ["sum", "count"]})
+    group_by_companies.columns = ['Company', 'Amount', 'bond_count']
+    group_by_companies["Amount (₹ Cr)"] = group_by_companies["Amount"].apply(format_amount)
+    group_by_companies["percentage"] = group_by_companies["Amount"].apply(
+        lambda x: calculate_percentage(x, group_by_companies["Amount"].sum())
+    )
+
+    party_i.subheader("Companies Purchased for this party")
+    party_i.markdown("---")
+    print(party_transactions.columns)
+    group_by_companies = group_by_companies.sort_values("Amount", ascending=False)
+    party_i.dataframe(group_by_companies[['Company', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+
 def display_overall_transactions(party_i, sorted_party, selected_party):
     """
     Displays overall transaction overview for the selected party.
@@ -122,7 +140,7 @@ def display_annual_party_contributions(party_i, party_year_group, selected_party
 
 
 
-def display_individual_party_data(party_year_group, sorted_party, parties, party_i):
+def display_individual_party_data(party_year_group, sorted_party, parties, merged_df, party_i):
     """
     Modular function to display data for an individual party, including transaction details,
     aggregate transactions, and annual contributions.
@@ -135,5 +153,6 @@ def display_individual_party_data(party_year_group, sorted_party, parties, party
     """
     selected_party = select_party(party_i, sorted_party)
     display_overall_transactions(party_i, sorted_party, selected_party)
+    display_donated_companies(party_i, selected_party, merged_df)
     display_annual_party_contributions(party_i, party_year_group, selected_party)
     display_party_transactions(party_i, parties, selected_party)
