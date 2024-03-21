@@ -1,24 +1,44 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from utils import calculate_percentage, format_amount, aggregate_transactions, format_and_sort_group
+from utils import (
+    calculate_percentage,
+    format_amount,
+    aggregate_transactions,
+    format_and_sort_group,
+)
 from streamlit_echarts import st_echarts
+
 
 def display_party_transactions(party_i, merged_df, selected_party):
     """
     Displays transactions of the selected party.
-    
+
     Parameters:
     - party_i: Streamlit container for displaying data.
     - parties: DataFrame containing party transaction data.
     - selected_party: The name of the selected party.
     """
-    party_transaction_details = merged_df[merged_df["party"] == selected_party].reset_index(drop=True)
+    party_transaction_details = merged_df[
+        merged_df["party"] == selected_party
+    ].reset_index(drop=True)
     party_i.subheader("Date-specific Bond Redemption Details")
     party_i.markdown("---")
-    party_i.dataframe(party_transaction_details[["Date_y", "Reference No  (URN)", "Journal Date", "Company", "Amount_y", "Prefix","Bond Number"]], column_config={
-        "Date_y": "Date",
-        "Amount_y": "Amount"
-    }, use_container_width=True)
+    party_i.dataframe(
+        party_transaction_details[
+            [
+                "Date_y",
+                "Reference No  (URN)",
+                "Journal Date",
+                "Company",
+                "Amount_y",
+                "Prefix",
+                "Bond Number",
+            ]
+        ],
+        column_config={"Date_y": "Date", "Amount_y": "Amount"},
+        use_container_width=True,
+    )
+
 
 def display_overall_party_data(sorted_party, party_ov):
     col1, col2 = party_ov.columns([3, 3])
@@ -67,48 +87,74 @@ def display_overall_party_data(sorted_party, party_ov):
         col2.bar_chart(bottom_10_df.set_index("party")["Amount"])
 
 
-
 def select_party(party_i, sorted_party):
     """
     Allows user to select a party from a dropdown.
-    
+
     Parameters:
     - party_i: Streamlit container for displaying the selection box.
     - sorted_party: DataFrame containing sorted party data.
-    
+
     Returns:
     - The name of the selected party.
     """
     return party_i.selectbox("Select a Party", sorted_party["party"].sort_values())
 
+
 def display_donated_category(selected_party, merged_df, party_left):
-    transactions_grouped_by_category = aggregate_transactions(merged_df[merged_df["party"] == selected_party], 'Category')
-    formatted_group = format_and_sort_group(transactions_grouped_by_category, format_amount, calculate_percentage)
-    
+    transactions_grouped_by_category = aggregate_transactions(
+        merged_df[merged_df["party"] == selected_party], 'Category', 
+        {"Category": "first", "Amount_y": ["sum", "count"]},
+    )
+    formatted_group = format_and_sort_group(
+        transactions_grouped_by_category, format_amount, calculate_percentage
+    )
+
     party_left.subheader("Bonds Details by Category")
     party_left.markdown("---")
-    party_left.dataframe(formatted_group[['Category', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+    party_left.dataframe(
+        formatted_group[
+            ["Category", "Amount", "bond_count", "Amount (₹ Cr)", "percentage"]
+        ]
+    )
 
 
 def display_donated_companies(selected_party, merged_df, party_left):
 
-    transactions_grouped_by_category = aggregate_transactions(merged_df[merged_df["party"] == selected_party], 'Company')
-    formatted_group = format_and_sort_group(transactions_grouped_by_category, format_amount, calculate_percentage)
-    
-    party_left.subheader("Companies Purchased for this party")
-    party_left.markdown("---")
-    party_left.dataframe(formatted_group[['Company', 'Amount', 'bond_count', 'Amount (₹ Cr)', 'percentage']])
+    transactions_grouped_by_category = aggregate_transactions(
+        merged_df[merged_df["party"] == selected_party], "Company",
+        {"Company": "first", "Parent Company": "first","Category":"first", "Amount_y": ["sum", "count"]},
+    )
+    formatted_group = format_and_sort_group(
+        transactions_grouped_by_category, format_amount, calculate_percentage
+    )
 
+    party_left.subheader("List of Company Contributions to This Party")
+    party_left.dataframe(
+        formatted_group[
+            [
+                "Company",
+                "Parent Company", "Category", "Amount",
+                "bond_count",
+                "Amount (₹ Cr)",
+                "percentage",
+            ]
+        ]
+    )
 
 
 def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
-    
-    party_transactions = merged_df[
-        merged_df["party"] == selected_party
-    ].reset_index(drop=True)
-    group_by_categories = party_transactions.groupby('Category').agg({"Category": "first","Amount_y": ["sum", "count"]})
-    group_by_categories.columns = ['Category', 'Amount', 'bond_count']
-    group_by_categories["Amount (₹ Cr)"] = group_by_categories["Amount"].apply(format_amount)
+
+    party_transactions = merged_df[merged_df["party"] == selected_party].reset_index(
+        drop=True
+    )
+    group_by_categories = party_transactions.groupby("Category").agg(
+        {"Category": "first", "Amount_y": ["sum", "count"]}
+    )
+    group_by_categories.columns = ["Category", "Amount", "bond_count"]
+    group_by_categories["Amount (₹ Cr)"] = group_by_categories["Amount"].apply(
+        format_amount
+    )
     group_by_categories["percentage"] = group_by_categories["Amount"].apply(
         lambda x: calculate_percentage(x, group_by_categories["Amount"].sum())
     )
@@ -123,7 +169,6 @@ def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
         .to_dict("records")
     )
     options = {
-       
         "tooltip": {"trigger": "item"},
         "legend": {"orient": "horizontal ", "bottom": "bottom"},
         "dataset": [
@@ -164,19 +209,22 @@ def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
         )
 
 
-
-
 def top_contributors(party_i, merged_df, selected_party, party_right):
-    party_right.header(f"Electoral Contributors' for this party")
+
     party_n = party_right.selectbox(
-            "Select Number of companies", [5,10,15,20],
-        )
-    party_transactions = merged_df[
-        merged_df["party"] == selected_party
-    ].reset_index(drop=True)
-    group_by_companies = party_transactions.groupby('Company').agg({"Company": "first","Amount_y": ["sum", "count"]})
-    group_by_companies.columns = ['Company', 'Amount', 'bond_count']
-    group_by_companies["Amount (₹ Cr)"] = group_by_companies["Amount"].apply(format_amount)
+        "Select Number of companies",
+        [5, 10, 15, 20],
+    )
+    party_transactions = merged_df[merged_df["party"] == selected_party].reset_index(
+        drop=True
+    )
+    group_by_companies = party_transactions.groupby("Company").agg(
+        {"Company": "first", "Amount_y": ["sum", "count"]}
+    )
+    group_by_companies.columns = ["Company", "Amount", "bond_count"]
+    group_by_companies["Amount (₹ Cr)"] = group_by_companies["Amount"].apply(
+        format_amount
+    )
     group_by_companies["percentage"] = group_by_companies["Amount"].apply(
         lambda x: calculate_percentage(x, group_by_companies["Amount"].sum())
     )
@@ -184,7 +232,10 @@ def top_contributors(party_i, merged_df, selected_party, party_right):
 
     top_df = group_by_companies.head(party_n)
     others = pd.DataFrame(
-        data={"Company": ["Other"], "Amount": [group_by_companies["Amount"][party_n:].sum()]}
+        data={
+            "Company": ["Other"],
+            "Amount": [group_by_companies["Amount"][party_n:].sum()],
+        }
     )
     others["Amount (₹ Cr)"] = (others["Amount"] / 10**7).map("{:,.2f}".format)
     combined_df = pd.concat([top_df, others])
@@ -197,7 +248,6 @@ def top_contributors(party_i, merged_df, selected_party, party_right):
         .to_dict("records")
     )
     options = {
-       
         "tooltip": {"trigger": "item"},
         "legend": {"orient": "horizontal ", "bottom": "bottom"},
         "dataset": [
@@ -230,7 +280,7 @@ def top_contributors(party_i, merged_df, selected_party, party_right):
             },
         ],
     }
-    
+
     with party_right:
         st_echarts(
             options=options,
@@ -238,12 +288,10 @@ def top_contributors(party_i, merged_df, selected_party, party_right):
         )
 
 
-
-
 def display_overall_transactions(party_i, sorted_party, selected_party):
     """
     Displays overall transaction overview for the selected party.
-    
+
     Parameters:
     - party_i: Streamlit container for displaying data.
     - sorted_party: DataFrame containing sorted party data.
@@ -257,10 +305,11 @@ def display_overall_transactions(party_i, sorted_party, selected_party):
     party_i.markdown("---")
     party_i.dataframe(overall_transaction_details)
 
+
 def display_annual_party_contributions(party_i, party_year_group, selected_party):
     """
     Displays annual contributions of the selected party.
-    
+
     Parameters:
     - party_i: Streamlit container for displaying data.
     - party_year_group: DataFrame containing annual party group data.
@@ -270,11 +319,13 @@ def display_annual_party_contributions(party_i, party_year_group, selected_party
     selected_party_year_spendings = party_year_group[
         party_year_group["party"] == selected_party
     ].reset_index(drop=True)
-    selected_party_year_spendings["Year"] = selected_party_year_spendings["Year"].astype(str)
+    selected_party_year_spendings["Year"] = selected_party_year_spendings[
+        "Year"
+    ].astype(str)
     selected_party_year_spendings["Amount (₹ Cr)"] = (
         selected_party_year_spendings["Amount"] / 10**7
     )
-    
+
     col1, col2 = party_i.columns([3, 3])
     with col1:
         col1.subheader("Annual Electoral Bond Redemption Summary")
@@ -285,12 +336,13 @@ def display_annual_party_contributions(party_i, party_year_group, selected_party
         col2.line_chart(selected_party_year_spendings.set_index("Year")["Amount"])
 
 
-
-def display_individual_party_data(party_year_group, sorted_party, parties, merged_df, party_i):
+def display_individual_party_data(
+    party_year_group, sorted_party, parties, merged_df, party_i
+):
     """
     Modular function to display data for an individual party, including transaction details,
     aggregate transactions, and annual contributions.
-    
+
     Parameters:
     - party_year_group: DataFrame containing annual party group data.
     - sorted_party: DataFrame containing sorted party data.
@@ -299,7 +351,7 @@ def display_individual_party_data(party_year_group, sorted_party, parties, merge
     """
     selected_party = select_party(party_i, sorted_party)
     display_overall_transactions(party_i, sorted_party, selected_party)
-    party_right, party_left = party_i.columns([3,3])
+    party_right, party_left = party_i.columns([3, 3])
     display_donated_companies(selected_party, merged_df, party_right)
     top_contributors(party_i, merged_df, selected_party, party_left)
     display_donated_category(selected_party, merged_df, party_right)

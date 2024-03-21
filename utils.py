@@ -71,13 +71,15 @@ def create_google_search_url(company, date):
     url = f"https://www.google.com/search?q={encoded_query}&tbs=cdr:1,cd_min:{cd_min},cd_max:{cd_max}"
     return url
 
-def aggregate_transactions(merged_df, group_by_column):
+def aggregate_transactions(merged_df, group_by_column, agg_columns):
     """Aggregate transactions by a specified column."""
-    transactions = merged_df.groupby(group_by_column).agg({
-        group_by_column: "first",
-        "Amount_y": ["sum", "count"]
-    })
-    transactions.columns = [group_by_column, 'Amount', 'bond_count']
+    transactions = merged_df.groupby(group_by_column).agg(agg_columns)
+    column_names = list(agg_columns.keys())
+    del column_names[-1]
+    column_names.append("Amount")
+    column_names.append("bond_count")
+    print(column_names  )
+    transactions.columns = column_names
     return transactions.reset_index(drop=True)
 
 def format_and_sort_group(group, amount_format_function, percentage_calc_function):
