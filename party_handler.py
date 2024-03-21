@@ -3,7 +3,7 @@ import pandas as pd
 from utils import calculate_percentage, format_amount
 from streamlit_echarts import st_echarts
 
-def display_party_transactions(party_i, parties, selected_party):
+def display_party_transactions(party_i, merged_df, selected_party):
     """
     Displays transactions of the selected party.
     
@@ -12,10 +12,13 @@ def display_party_transactions(party_i, parties, selected_party):
     - parties: DataFrame containing party transaction data.
     - selected_party: The name of the selected party.
     """
-    party_transaction_details = parties[parties["party"] == selected_party].reset_index(drop=True)
+    party_transaction_details = merged_df[merged_df["party"] == selected_party].reset_index(drop=True)
     party_i.subheader("Date-specific Bond Redemption Details")
     party_i.markdown("---")
-    party_i.dataframe(party_transaction_details[["Date", "party", "Amount"]])
+    party_i.dataframe(party_transaction_details[["Date_y", "Company", "Amount_y", "Prefix","Bond Number"]], column_config={
+        "Date_y": "Date",
+        "Amount_y": "Amount"
+    }, use_container_width=True)
 
 def display_overall_party_data(sorted_party, party_ov):
     col1, col2 = party_ov.columns([3, 3])
@@ -234,4 +237,4 @@ def display_individual_party_data(party_year_group, sorted_party, parties, merge
     display_donated_companies(party_i, selected_party, merged_df, party_right)
     top_contributors(party_i, merged_df, selected_party, party_left)
     display_annual_party_contributions(party_i, party_year_group, selected_party)
-    display_party_transactions(party_i, parties, selected_party)
+    display_party_transactions(party_i, merged_df, selected_party)
