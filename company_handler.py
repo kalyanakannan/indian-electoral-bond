@@ -108,6 +108,35 @@ def display_category_data(company_ov, category_group, sorted_company):
             )
 
 
+def display_parent_company_data(company_ov, parent_company_group, sorted_company):
+    """
+    Displays data and allows interaction based on categories.
+
+    Parameters:
+    - company_ov: Streamlit container for displaying data.
+    - category_group: DataFrame of aggregated category data.
+    - sorted_company: DataFrame containing sorted company data.
+    """
+    col1, col2 = company_ov.columns([3, 3])
+    with col1:
+        display_major_contributors(col1, parent_company_group)
+
+    with col2:
+        col2.subheader("Explore Companies by Parent company")
+        selected_parent_company = col2.selectbox(
+            "Select a Parent Company", parent_company_group["Parent Company"]
+        )
+        category_companies = sorted_company[
+            sorted_company["Parent Company"] == selected_parent_company
+        ].reset_index(drop=True)
+        category_companies["percentage"] = (
+            category_companies["Amount"] / category_companies["Amount"].sum() * 100
+        ).map("{:.2f}%".format)
+        
+        col2.dataframe(
+            category_companies[["Company", "Bond_count", "Amount (₹ Cr)", "percentage"]]
+        )
+
 def display_major_contributors(company_ov, parent_company_group):
     """
     Displays a DataFrame of major contributing entities to electoral bonds.
@@ -154,7 +183,7 @@ def display_overall_company_data(
     display_overview(company_ov, sorted_company)
     # display_pie_chart(company_ov, sorted_company) # Uncomment if pie chart display is desired
     display_category_data(company_ov, category_group, sorted_company)
-    display_major_contributors(company_ov, parent_company_group)
+    display_parent_company_data(company_ov, parent_company_group, sorted_company)
     display_top_and_bottom_donors(company_ov, sorted_company)
 
 def select_company(company_i, sorted_company):
