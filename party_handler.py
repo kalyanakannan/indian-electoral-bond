@@ -305,7 +305,7 @@ def display_overall_transactions(party_i, sorted_party, selected_party):
     overall_transaction_details = sorted_party[
         sorted_party["party"] == selected_party
     ].reset_index(drop=True)
-    overall_transaction_details["Bond Count"] = overall_transaction_details.shape[0]
+    
     party_i.subheader("Comprehensive Transaction Overview")
     party_i.markdown("---")
     party_i.dataframe(overall_transaction_details)

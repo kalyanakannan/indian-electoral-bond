@@ -31,7 +31,8 @@ def load_and_prepare_data(csv_file):
         r"DR REDDYS LABORATORIES LIMITED": "DR.REDDY'S LABORATORIES LTD",
         r"NATCO PHARMA LTD": "NATCO PHARMA LIMITED",
         r"AUROBINDO PHARMA LIMITED":"AUROBINDO PHARMA LTD",
-        r"SENGUPTA AND SENGUPTA PRIVATE LIMIT": "SENGUPTA AND SENGUPTA PVT LTD"
+        r"SENGUPTA AND SENGUPTA PRIVATE LIMIT": "SENGUPTA AND SENGUPTA PVT LTD",
+        r"INORBIT MALLS  INDIA  PRIVATE LIMIT": "INORBIT MALLS INDIA PRIVATE LIMITED"
     }
     for pattern, replacement in company_replacements.items():
         companies["Company"] = companies["Company"].str.replace(
