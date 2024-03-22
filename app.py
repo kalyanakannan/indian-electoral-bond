@@ -18,7 +18,7 @@ def main():
     # Load and prepare party data from CSV.
     parties = load_and_prepare_party_data('data/Electoral Bonds - Party-list.csv')
 
-    merged_df = merge_parties_companies (parties, companies)
+    merged_df = merge_parties_companies(parties, companies)
 
     # Summarize company data to get sorted lists and grouped data for display.
     sorted_company, year_company_group, parent_company_group, category_group = (

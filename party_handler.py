@@ -115,7 +115,7 @@ def display_donated_category(selected_party, merged_df, party_left):
     party_left.dataframe(
         formatted_group[
             ["Category", "Amount", "bond_count", "Amount (₹ Cr)", "percentage"]
-        ]
+        ],use_container_width=True
     )
 
 
@@ -130,6 +130,7 @@ def display_donated_companies(selected_party, merged_df, party_left):
     )
 
     party_left.subheader("List of Company Contributions to This Party")
+    party_left.markdown("---")
     party_left.dataframe(
         formatted_group[
             [
@@ -139,11 +140,11 @@ def display_donated_companies(selected_party, merged_df, party_left):
                 "Amount (₹ Cr)",
                 "percentage",
             ]
-        ]
+        ], use_container_width=True
     )
 
 
-def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
+def top_contributors_catgory(merged_df, selected_party, party_left):
 
     party_transactions = merged_df[merged_df["party"] == selected_party].reset_index(
         drop=True
@@ -159,10 +160,14 @@ def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
         lambda x: calculate_percentage(x, group_by_categories["Amount"].sum())
     )
     group_by_categories = group_by_categories.sort_values("Amount", ascending=False)
-
-    group_by_categories["Amount (₹ Cr)"] = (
-        group_by_categories["Amount (₹ Cr)"].str.replace(",", "").astype(float)
-    )
+    try:
+        group_by_categories["Amount (₹ Cr)"] = (
+            group_by_categories["Amount (₹ Cr)"].str.replace(",", "").astype(float)
+        )
+    except:
+        group_by_categories["Amount (₹ Cr)"] = (
+            group_by_categories["Amount (₹ Cr)"].astype(float)
+        )
     data = (
         group_by_categories[["Category", "Amount (₹ Cr)"]]
         .rename(columns={"Category": "name", "Amount (₹ Cr)": "value"})
@@ -201,15 +206,15 @@ def top_contributors_catgory(party_i, merged_df, selected_party, party_right):
             },
         ],
     }
-    party_right.header(f"Electoral Contributors' by Category")
-    with party_right:
+    party_left.header(f"Electoral Contributors' by Category")
+    with party_left:
         st_echarts(
             options=options,
             height="600px",
         )
 
 
-def top_contributors(party_i, merged_df, selected_party, party_right):
+def top_contributors(merged_df, selected_party, party_right):
 
     party_n = party_right.selectbox(
         "Select Number of companies",
@@ -353,8 +358,8 @@ def display_individual_party_data(
     display_overall_transactions(party_i, sorted_party, selected_party)
     party_right, party_left = party_i.columns([3, 3])
     display_donated_companies(selected_party, merged_df, party_right)
-    top_contributors(party_i, merged_df, selected_party, party_left)
-    display_donated_category(selected_party, merged_df, party_right)
-    top_contributors_catgory(party_i, merged_df, selected_party, party_left)
+    display_donated_category(selected_party, merged_df, party_left)
+    top_contributors(merged_df, selected_party, party_right)
+    top_contributors_catgory(merged_df, selected_party, party_left)
     display_annual_party_contributions(party_i, party_year_group, selected_party)
     display_party_transactions(party_i, merged_df, selected_party)
