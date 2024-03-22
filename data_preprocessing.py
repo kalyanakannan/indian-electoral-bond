@@ -1,5 +1,6 @@
 from utils import aggregate_data
 
+
 def summarize_data(companies):
     """
     Summarizes company data into various aggregated groups.
@@ -17,18 +18,28 @@ def summarize_data(companies):
             "Company": "first",
             "Category": "first",
             "Year": "first",
+            "is_ED_raid": "first",
+            "Date of Raid": "first",
             "Amount": ["sum", "count"],
         },
         companies,
     )
     company_group = aggregate_data(
         ["Company"],
-        {"Company": "first", "company_id":"first","Category": "first","Parent Company":"first", "Amount": ["sum", "count"]},
+        {
+            "Company": "first",
+            "is_ED_raid": "first",
+            "Date of Raid": "first",
+            "company_id": "first",
+            "Category": "first",
+            "Parent Company": "first",
+            "Amount": ["sum", "count"],
+        },
         companies,
     )
     parent_company_group = aggregate_data(
         ["Parent Company"],
-        {"Parent Company":"first", "Amount": ["sum", "count"]},
+        {"Parent Company": "first", "Amount": ["sum", "count"]},
         companies,
     )
     category_group = aggregate_data(
@@ -69,8 +80,7 @@ def summarize_party_data(parties):
         party_group["Amount"] / party_group["Amount"].sum() * 100
     ).map("{:.2f}%".format)
 
-    # Return two DataFrames: 
+    # Return two DataFrames:
     # 1. party_group sorted by Amount in descending order for overall party rankings.
     # 2. party_year_group with detailed yearly contributions and counts for further analysis.
     return party_group.sort_values("Amount", ascending=False), party_year_group
-

@@ -13,10 +13,11 @@ def display_metrics(company_ov, sorted_company):
     - company_ov: Streamlit container for displaying data.
     - sorted_company: DataFrame containing sorted company data.
     """
-    total_company, total_amount, total_bond_count = company_ov.columns(3)
+    total_company, total_amount, total_bond_count, ed_raid_companies = company_ov.columns(4)
     total_company.metric("Total Companies", len(sorted_company))
     total_amount.metric("Total Amount (₹ Cr)", sorted_company["Amount"].sum() / 10**7)
     total_bond_count.metric("Total Bonds", sorted_company["Bond_count"].sum())
+    ed_raid_companies.metric("Total ED Raid Companies", (sorted_company['is_ED_raid'] == 1).sum())
 
 def add_open_corporate_url(url):
     url_prefix  = "https://opencorporates.com/companies/in/"
@@ -37,10 +38,12 @@ def display_overview(company_ov, sorted_company):
     sorted_company['company_details'] = sorted_company['company_id'].apply(add_open_corporate_url)
     # sorted_company = sorted_company.drop([" "], axis=1)
     sorted_company = sorted_company.reset_index(drop=True)
+    sorted_company['is_ED_raid'] = sorted_company['is_ED_raid'].map({1: 'Yes', 0: 'No'})
     company_ov.markdown("---")
     company_ov.dataframe(
-        sorted_company[['Company', 'Category', 'Bond_count', 'Amount', 'Amount (₹ Cr)', 'percentage', 'company_details']] , use_container_width=True, column_config={
+        sorted_company[['Company', 'Category', 'Bond_count', 'Amount', 'Amount (₹ Cr)', 'percentage', 'is_ED_raid', 'Date of Raid', 'company_details']] , use_container_width=True, column_config={
         "company_details": st.column_config.LinkColumn("company_details"),
+        "is_ED_raid": "ED Raid"
     }
     )
 
