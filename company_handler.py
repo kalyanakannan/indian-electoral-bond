@@ -80,6 +80,7 @@ def display_category_data(company_ov, category_group, sorted_company):
     - sorted_company: DataFrame containing sorted company data.
     """
     col1, col2 = company_ov.columns([3, 3])
+    category_group = category_group.reset_index(drop=True)
     with col1:
         col1.subheader("Top Donor Categories by Electoral Bond Contributions")
         col1.dataframe(
@@ -145,6 +146,7 @@ def display_major_contributors(company_ov, parent_company_group):
     - company_ov: Streamlit container for displaying data.
     - parent_company_group: DataFrame of aggregated parent company data.
     """
+    parent_company_group = parent_company_group.reset_index(drop=True)
     company_ov.subheader("Major Contributing Entities to Electoral Bonds")
     company_ov.dataframe(parent_company_group, use_container_width=True)
 
