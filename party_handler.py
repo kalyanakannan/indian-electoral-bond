@@ -123,11 +123,13 @@ def display_donated_companies(selected_party, merged_df, party_left):
 
     transactions_grouped_by_category = aggregate_transactions(
         merged_df[merged_df["party"] == selected_party], "Company",
-        {"Company": "first", "Parent Company": "first","Category":"first", "Amount_y": ["sum", "count"]},
+        {"Company": "first", "is_ED_raid": "first", "Date of Raid": "first", "Parent Company": "first","Category":"first", "Amount_y": ["sum", "count"]},
     )
     formatted_group = format_and_sort_group(
         transactions_grouped_by_category, format_amount, calculate_percentage
     )
+
+    formatted_group['is_ED_raid'] = formatted_group['is_ED_raid'].map({1: 'Yes', 0: 'No'})
 
     party_left.subheader("List of Company Contributions to This Party")
     party_left.markdown("---")
@@ -135,12 +137,17 @@ def display_donated_companies(selected_party, merged_df, party_left):
         formatted_group[
             [
                 "Company",
+                "is_ED_raid",
+                "Date of Raid",
                 "Parent Company", "Category", "Amount",
                 "bond_count",
                 "Amount (₹ Cr)",
                 "percentage",
             ]
-        ], use_container_width=True
+        ], use_container_width=True,
+        column_config={
+            "is_ED_raid": "ED Raid",
+        }
     )
 
 
