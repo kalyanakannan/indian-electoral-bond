@@ -23,6 +23,22 @@ def display_party_transactions(party_i, merged_df, selected_party):
     ].reset_index(drop=True)
     party_i.subheader("Date-specific Bond Redemption Details")
     party_i.markdown("---")
+
+    party_filter_left, party_filter_right = party_i.columns([3, 3])
+    c_filter = party_filter_left.multiselect(
+    'Filter by Company',
+    sorted(party_transaction_details['Company'].unique()))
+
+    c_date_filter = party_filter_right.multiselect(
+    'Filter by transaction date',
+    sorted(party_transaction_details['Date_y'].unique()))
+
+    if c_filter:
+       party_transaction_details = party_transaction_details[party_transaction_details['Company'].isin(c_filter)]
+    
+    if c_date_filter:
+        party_transaction_details = party_transaction_details[party_transaction_details['Date_y'].isin(c_date_filter)]
+
     party_i.dataframe(
         party_transaction_details[
             [

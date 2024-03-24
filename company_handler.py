@@ -254,6 +254,21 @@ def display_company_transactions(company_i, merged_df, selected_company):
     ].reset_index(drop=True)
     company_i.subheader("Detailed Donor Contributions by Date")
     company_i.markdown("---")
+    filter_left, filter_right = company_i.columns([3, 3])
+    party_filter = filter_left.multiselect(
+    'Filter by party',
+    sorted(company_transaction_details['party'].unique()))
+
+    date_filter = filter_right.multiselect(
+    'Filter by date',
+    sorted(company_transaction_details['Date_x'].unique()))
+
+    if party_filter:
+       company_transaction_details = company_transaction_details[company_transaction_details['party'].isin(party_filter)]
+    
+    if date_filter:
+        company_transaction_details = company_transaction_details[company_transaction_details['Date_x'].isin(date_filter)]
+
     query = f"{selected_company.lower()} when:1y"
     encoded_query = urllib.parse.quote(query)
     url = f"https://news.google.com/search?q={encoded_query}"
